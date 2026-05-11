@@ -1,0 +1,117 @@
+project: calendar-app
+test_dirs: [tests/]
+source_dirs: [src/]
+
+requirements:
+
+  REQ-001:
+    title: "イベントを作成する"
+    perspectives:
+      TC-001-01: {category: normal,   level: unit,        desc: "タイトル・開始日時・終了日時を指定してイベントを作成できる"}
+      TC-001-02: {category: normal,   level: unit,        desc: "終日イベントとして作成できる"}
+      TC-001-03: {category: boundary, level: unit,        desc: "タイトルが最大文字数（255文字）のとき作成できる"}
+      TC-001-04: {category: boundary, level: unit,        desc: "開始日時と終了日時が同じ（0分イベント）でも作成できる"}
+      TC-001-05: {category: error,    level: unit,        desc: "タイトルが空のとき ValidationError を raise する"}
+      TC-001-06: {category: error,    level: unit,        desc: "終了日時が開始日時より前のとき ValidationError を raise する"}
+      TC-001-07: {category: branch,   level: unit,        desc: "繰り返し設定（daily/weekly/monthly）が保存される"}
+      TC-001-08: {category: normal,   level: integration, desc: "作成したイベントがDBに永続化されて取得できる"}
+      TC-001-09: {category: normal,   level: e2e,         desc: "UI からイベントを作成するとカレンダーに表示される"}
+
+  REQ-002:
+    title: "イベントを編集する"
+    perspectives:
+      TC-002-01: {category: normal,   level: unit,        desc: "タイトルを変更できる"}
+      TC-002-02: {category: normal,   level: unit,        desc: "開始日時・終了日時を変更できる"}
+      TC-002-03: {category: normal,   level: unit,        desc: "説明・場所を変更できる"}
+      TC-002-04: {category: error,    level: unit,        desc: "存在しないイベントIDを指定すると NotFoundError を raise する"}
+      TC-002-05: {category: branch,   level: unit,        desc: "繰り返しイベントの「この予定のみ」を選択すると例外インスタンスが作成される"}
+      TC-002-06: {category: branch,   level: unit,        desc: "繰り返しイベントの「以降すべて」を選択するとシリーズが分割される"}
+      TC-002-07: {category: branch,   level: unit,        desc: "繰り返しイベントの「すべて」を選択すると元シリーズ全体が更新される"}
+      TC-002-08: {category: normal,   level: integration, desc: "編集結果がDBに反映されて取得時に新しい値が返る"}
+
+  REQ-003:
+    title: "イベントを削除する"
+    perspectives:
+      TC-003-01: {category: normal,   level: unit,        desc: "IDを指定してイベントを削除できる"}
+      TC-003-02: {category: error,    level: unit,        desc: "存在しないイベントIDを指定すると NotFoundError を raise する"}
+      TC-003-03: {category: branch,   level: unit,        desc: "繰り返しイベントの「この予定のみ」削除が機能する"}
+      TC-003-04: {category: branch,   level: unit,        desc: "繰り返しイベントの「以降すべて」削除が機能する"}
+      TC-003-05: {category: branch,   level: unit,        desc: "繰り返しイベントの「すべて」削除が機能する"}
+      TC-003-06: {category: boundary, level: unit,        desc: "削除済みイベントを再度削除しようとすると NotFoundError を raise する"}
+      TC-003-07: {category: normal,   level: integration, desc: "削除後にDBから該当イベントが取得できなくなる"}
+
+  REQ-004:
+    title: "カレンダービューにイベント一覧を表示する"
+    perspectives:
+      TC-004-01: {category: normal,   level: unit,        desc: "月ビューで指定月のイベント一覧を取得できる"}
+      TC-004-02: {category: normal,   level: unit,        desc: "週ビューで指定週のイベント一覧を取得できる"}
+      TC-004-03: {category: normal,   level: unit,        desc: "日ビューで指定日のイベント一覧を取得できる"}
+      TC-004-04: {category: boundary, level: unit,        desc: "イベントが0件のとき空リストを返す"}
+      TC-004-05: {category: boundary, level: unit,        desc: "月またぎのイベントが両月に含まれる"}
+      TC-004-06: {category: normal,   level: unit,        desc: "開始日時昇順でソートされる"}
+      TC-004-07: {category: branch,   level: unit,        desc: "繰り返しイベントが展開されて期間内の各インスタンスが返る"}
+      TC-004-08: {category: normal,   level: integration, desc: "DBに登録されたイベントが正しくビューに反映される"}
+      TC-004-09: {category: normal,   level: e2e,         desc: "月ビューを開くと当月のイベントが表示される"}
+
+  REQ-005:
+    title: "イベントを検索する"
+    perspectives:
+      TC-005-01: {category: normal,   level: unit,        desc: "タイトルの部分一致で検索できる"}
+      TC-005-02: {category: normal,   level: unit,        desc: "説明の部分一致で検索できる"}
+      TC-005-03: {category: normal,   level: unit,        desc: "期間を絞り込んで検索できる"}
+      TC-005-04: {category: boundary, level: unit,        desc: "ヒット0件のとき空リストを返す"}
+      TC-005-05: {category: boundary, level: unit,        desc: "検索クエリが空文字のとき全件を返す"}
+      TC-005-06: {category: normal,   level: unit,        desc: "NFKC 正規化後に全角・半角を区別せずマッチする"}
+      TC-005-07: {category: normal,   level: integration, desc: "DBの実データに対して検索が正しく動作する"}
+
+  REQ-006:
+    title: "リマインダー・通知を設定する"
+    perspectives:
+      TC-006-01: {category: normal,   level: unit,        desc: "イベント開始の N 分前にリマインダーを設定できる"}
+      TC-006-02: {category: normal,   level: unit,        desc: "複数のリマインダーを同一イベントに設定できる"}
+      TC-006-03: {category: boundary, level: unit,        desc: "リマインダーが0分前（開始時刻ちょうど）でも設定できる"}
+      TC-006-04: {category: error,    level: unit,        desc: "負の分数を指定すると ValidationError を raise する"}
+      TC-006-05: {category: branch,   level: unit,        desc: "メール通知・プッシュ通知の種別が保存される"}
+      TC-006-06: {category: normal,   level: integration, desc: "設定時刻になるとスケジューラーが通知タスクをキューに積む"}
+
+  REQ-007:
+    title: "カレンダーを共有する"
+    perspectives:
+      TC-007-01: {category: normal,   level: unit,        desc: "メールアドレスを指定して閲覧権限で共有できる"}
+      TC-007-02: {category: normal,   level: unit,        desc: "メールアドレスを指定して編集権限で共有できる"}
+      TC-007-03: {category: error,    level: unit,        desc: "無効なメールアドレス形式で共有しようとすると ValidationError を raise する"}
+      TC-007-04: {category: branch,   level: unit,        desc: "既に共有済みのユーザーへの再共有は権限が上書きされる"}
+      TC-007-05: {category: boundary, level: unit,        desc: "共有を解除するとユーザーの権限リストから削除される"}
+      TC-007-06: {category: normal,   level: integration, desc: "共有されたカレンダーが対象ユーザーのカレンダー一覧に表示される"}
+
+  REQ-008:
+    title: "カレンダーと外部サービスを同期する"
+    perspectives:
+      TC-008-01: {category: normal,   level: unit,        desc: "Google Calendar API からイベントを取得してDBに保存できる"}
+      TC-008-02: {category: normal,   level: unit,        desc: "ローカルの変更を Google Calendar API に反映できる"}
+      TC-008-03: {category: boundary, level: unit,        desc: "同期対象イベントが0件のとき何もしない"}
+      TC-008-04: {category: branch,   level: unit,        desc: "ローカルとリモートの両方で変更がある場合にコンフリクトを検出する"}
+      TC-008-05: {category: error,    level: unit,        desc: "API レート制限エラー時にリトライして最終失敗なら例外を raise する"}
+      TC-008-06: {category: error,    level: unit,        desc: "認証トークン期限切れ時にリフレッシュして再試行する"}
+      TC-008-07: {category: normal,   level: integration, desc: "同期後にローカルDBとリモートの内容が一致する"}
+
+  REQ-009:
+    title: "CLI 引数を解釈して処理を制御する"
+    perspectives:
+      TC-009-01: {category: normal,   level: unit,        desc: "--dry-run のデフォルトは False"}
+      TC-009-02: {category: normal,   level: unit,        desc: "--dry-run 指定時は True"}
+      TC-009-03: {category: normal,   level: unit,        desc: "--from のデフォルトは None"}
+      TC-009-04: {category: normal,   level: unit,        desc: "--from が date として取得できる"}
+      TC-009-05: {category: normal,   level: unit,        desc: "--to のデフォルトは None"}
+      TC-009-06: {category: normal,   level: unit,        desc: "--to が date として取得できる"}
+      TC-009-07: {category: error,    level: unit,        desc: "--from が --to より後の日付のとき ArgumentError を raise する"}
+      TC-009-08: {category: branch,   level: unit,        desc: "--dry-run 時にDB書き込みをスキップする"}
+      TC-009-09: {category: branch,   level: unit,        desc: "--dry-run 時に外部API呼び出しをスキップする"}
+      TC-009-10: {category: normal,   level: unit,        desc: "--dry-run 時にスキップした処理の一覧を出力する"}
+
+  REQ-E01:
+    title: "イベントの作成から通知までの一気通貫フロー"
+    perspectives:
+      TC-E01-01: {category: normal,   level: e2e, desc: "イベント作成・リマインダー設定・通知受信の正常フロー全体"}
+      TC-E01-02: {category: error,    level: e2e, desc: "未認証状態で操作すると認証画面にリダイレクトされる"}
+      TC-E01-03: {category: normal,   level: e2e, desc: "外部カレンダーと同期後にUIに反映される"}
